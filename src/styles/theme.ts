@@ -10,7 +10,7 @@ export default {
 
     line: '#EBEBF0',
 
-    main: '#DC3617',
+    main: '#DC1637',
     main_light: '#FDEDEF',
     success: '#03B252',
 
