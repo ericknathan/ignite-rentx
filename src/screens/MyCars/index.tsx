@@ -5,7 +5,7 @@ import { useTheme } from 'styled-components';
 import { AntDesign } from '@expo/vector-icons';
 
 import { BackButton } from '../../components/BackButton';
-import { Loader } from '../../components/Loader';
+import { AnimatedLoader } from '../../components/AnimatedLoader';
 import { Car } from '../../components/Car';
 
 import { CarDTO } from '../../dtos/CarDTO';
@@ -72,7 +72,7 @@ export function MyCars() {
         </Title>
         <SubTitle>Conforto, segurança e praticidade.</SubTitle>
       </Header>
-      { isLoading ? <Loader /> :
+      { isLoading ? <AnimatedLoader /> :
         <Content>
           <Appointments>
             <AppointmentsTitle>Agendamentos feitos</AppointmentsTitle>

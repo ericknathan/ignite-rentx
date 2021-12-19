@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from 'styled-components';
+import {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedGestureHandler,
+  withSpring
+} from 'react-native-reanimated';
 
 import { StatusBar, BackHandler } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+import { PanGestureHandler } from 'react-native-gesture-handler';
 
 import Logo from '../../assets/logo.svg';
 import { api } from '../../services/api';
 import { CarDTO } from '../../dtos/CarDTO';
 
 import { Car } from '../../components/Car'
-import { Loader } from '../../components/Loader'
+import { AnimatedLoader } from '../../components/AnimatedLoader';
 
 import {
   Container,
@@ -25,6 +33,34 @@ import {
 export function Home() {
   const [cars, setCars] = useState<CarDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const positionY = useSharedValue(0);
+  const positionX = useSharedValue(0);
+
+  const myCarsButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: positionY.value },
+        { translateX: positionX.value }
+      ]
+    };
+  });
+
+  const onGestureEvent = useAnimatedGestureHandler({
+    onStart: (_, ctx: any) => {
+      ctx.positionX = positionX.value;
+      ctx.positionY = positionY.value;
+
+    },
+    onActive: (event, ctx: any) => {
+      positionY.value = ctx.positionX + event.translationY;
+      positionX.value = ctx.positionY + event.translationX;
+    },
+    onEnd: (event, ctx) => {
+      positionX.value = withSpring(0);
+      positionY.value = withSpring(0);
+    }
+  })
 
   const navigation = useNavigation();
   const theme = useTheme();
@@ -56,7 +92,7 @@ export function Home() {
     BackHandler.addEventListener('hardwareBackPress', () => {
       return true;
     });
-  })
+  }, []);
 
   return (
     <Container>
@@ -71,14 +107,17 @@ export function Home() {
             width={RFValue(108)}
             height={RFValue(12)}
           />
-          <TotalCars>
-            Total de {cars.length} carros
-          </TotalCars>
+          {
+            !isLoading && 
+            <TotalCars>
+              Total de {cars.length} carros
+            </TotalCars>
+          }
         </HeaderContent>
       </Header>
 
       {
-        isLoading ? <Loader /> :
+        isLoading ? <AnimatedLoader /> :
         <CarList
           data={cars}
           keyExtractor={item => String(item.id)}
@@ -90,13 +129,15 @@ export function Home() {
           }
         />
       }
-      <MyCarsButton onPress={handleOpenMyCars}>
-        <Ionicons
-          name="ios-car-sport"
-          size={32}
-          color={theme.colors.shape}
-        />
-      </MyCarsButton>
+      <PanGestureHandler onGestureEvent={onGestureEvent}>
+        <MyCarsButton onPress={handleOpenMyCars} style={myCarsButtonStyle}>
+          <Ionicons
+            name="ios-car-sport"
+            size={32}
+            color={theme.colors.shape}
+          />
+        </MyCarsButton>
+      </PanGestureHandler>
     </Container>
   );
 };

@@ -1,5 +1,13 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useAnimatedScrollHandler,
+  useSharedValue,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolate
+} from 'react-native-reanimated';
 
 import { CarDTO } from '../../dtos/CarDTO';
 
@@ -12,6 +20,7 @@ import { getAccessoryIcon } from '../../utils/getAccessoryIcon';
 
 import {
   Container,
+  HeaderWrapper,
   Header,
   CarImages,
   Content,
@@ -36,6 +45,33 @@ export function CarDetails() {
   const route = useRoute();
   const { car } = route.params as Params;
 
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollY.value = event.contentOffset.y;
+  });
+
+  const headerStyleAnimation = useAnimatedStyle(() => {
+    return {
+      height: interpolate(
+        scrollY.value,
+        [0, 200],
+        [200, 70],
+        Extrapolate.CLAMP
+      )
+    }
+  });
+
+  const sliderCarsStyleAnimation = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        scrollY.value,
+        [0, 150],
+        [1, 0],
+        Extrapolate.CLAMP
+      )
+    }
+  });
+
   function handleConfirmRental() {
     navigation.navigate('Scheduling', {
       car
@@ -48,15 +84,27 @@ export function CarDetails() {
 
   return (
     <Container>
-      <Header>
-        <BackButton onPress={handleBack} />
-      </Header>
+      <StatusBar
+        barStyle="dark-content"
+        translucent
+        backgroundColor="transparent"
+      />
 
-      <CarImages>
-        <ImageSlider imagesUrl={car.photos}/>
-      </CarImages>
+      <HeaderWrapper
+        style={[headerStyleAnimation]}
+      >
+        <Header>
+          <BackButton onPress={handleBack} />
+        </Header>
 
-      <Content>
+        <CarImages style={[sliderCarsStyleAnimation]}>
+          <ImageSlider imagesUrl={car.photos}/>
+        </CarImages>
+      </HeaderWrapper>
+
+      <Content
+        onScroll={scrollHandler}
+      >
         <Details>
           <Description>
             <Brand>{car.brand}</Brand>
@@ -81,7 +129,7 @@ export function CarDetails() {
           }
         </Accessories>
 
-        <About>{car.about}</About>
+        <About>{car.about}{car.about}{car.about}{car.about}{car.about}</About>
       </Content>
 
       <Footer>
