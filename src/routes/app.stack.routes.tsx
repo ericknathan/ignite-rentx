@@ -1,28 +1,23 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { Home } from '../screens/Home';
 import { CarDetails } from '../screens/CarDetails';
 import { Scheduling } from '../screens/Scheduling';
 import { SchedulingDetails } from '../screens/SchedulingDetails';
-import { SchedulingComplete } from '../screens/SchedulingComplete';
+import { Confirmation } from '../screens/Confirmation';
 import { MyCars } from '../screens/MyCars';
-import { Splash } from '../screens/Splash';
 
-const { Navigator, Screen } = createNativeStackNavigator();
+const { Navigator, Screen } = createStackNavigator();
 
-export function StackRoutes() {
+export function AppStackRoutes() {
   return (
     <Navigator
       screenOptions={{
         headerShown: false
       }}
-      initialRouteName="Splash"
+      initialRouteName="Home"
     >
-      <Screen
-        name="Splash"
-        component={Splash}
-      />
       <Screen
         name="Home"
         component={Home}
@@ -43,8 +38,8 @@ export function StackRoutes() {
         component={SchedulingDetails}
       />
       <Screen
-        name="SchedulingComplete"
-        component={SchedulingComplete}
+        name="Confirmation"
+        component={Confirmation}
       />
       <Screen
         name="MyCars"

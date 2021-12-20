@@ -9,6 +9,11 @@
     "splash": {
       "image": "./assets/splash.png",
       "backgroundColor": "#1B1B1F"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#00000000",
+      "translucent": true,
+      "barStyle": "light-content"
     }
   },
   "name": "rentx"
