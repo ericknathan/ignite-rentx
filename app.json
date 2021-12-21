@@ -10,6 +10,7 @@
       "image": "./assets/splash.png",
       "backgroundColor": "#1B1B1F"
     },
+    "icon": "./assets/icon.png",
     "androidStatusBar": {
       "backgroundColor": "#00000000",
       "translucent": true,
