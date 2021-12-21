@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../hooks/auth';
 import { useTheme } from 'styled-components';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from '../../components/BackButton';
@@ -38,6 +39,8 @@ import {
 
 export function Profile() {
   const { user, signOut, updateUser } = useAuth();
+  const netInfo = useNetInfo();
+
   const theme = useTheme();
   const navigation = useNavigation();
 
@@ -51,7 +54,11 @@ export function Profile() {
   }
 
   function handleOptionChange(optionSelected: 'dataEdit' | 'passwordEdit') {
-    setOption(optionSelected);
+    if(netInfo.isConnected === false && optionSelected === 'passwordEdit') {
+      Alert.alert('Sem conexão com a internet', 'É necessário ter conexão com a internet para alterar a senha.');
+    } else {
+      setOption(optionSelected);
+    }
   }
 
   async function handleAvatarSelect() {
@@ -111,7 +118,8 @@ export function Profile() {
 
       navigation.navigate('Confirmation', {
         title: 'Feito!',
-        message: 'Perfil atualizado com sucesso!'
+        message: 'Perfil atualizado com sucesso!',
+        nextScreenRoute: 'Profile'
       })
     } catch (error) {
       if(error instanceof Yup.ValidationError) {
@@ -170,14 +178,17 @@ export function Profile() {
                   Dados
                 </OptionTitle>
               </Option>
-              <Option
-                active={option === 'passwordEdit'}
-                onPress={() => handleOptionChange('passwordEdit')}
-              >
-                <OptionTitle active={option === 'passwordEdit'}>
-                  Trocar senha
-                </OptionTitle>
-              </Option>
+              {
+                netInfo.isConnected &&
+                <Option
+                  active={option === 'passwordEdit'}
+                  onPress={() => handleOptionChange('passwordEdit')}
+                >
+                  <OptionTitle active={option === 'passwordEdit'}>
+                    Trocar senha
+                  </OptionTitle>
+                </Option>
+              }
             </OptionsWrapper>
 
             {
